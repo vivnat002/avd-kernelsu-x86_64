@@ -647,11 +647,6 @@ jobs:
             echo "goldfish: added at X86_X2APIC"
           fi
 
-          if ! grep -qE '^CONFIG_GOLDFISH_PIPE=(y|m)$' "$DEFCONFIG"; then
-            sed -i '/^CONFIG_DEBUG_KINFO=y$/a CONFIG_GOLDFISH_PIPE=m' "$DEFCONFIG"
-            echo "goldfish_pipe: added as =m after DEBUG_KINFO (AVD ships goldfish_pipe.ko in /vendor)"
-          fi
-
           echo "===== AFTER ====="
           grep -nE 'DMABUF_HEAPS|GOLDFISH' "$DEFCONFIG"
 
