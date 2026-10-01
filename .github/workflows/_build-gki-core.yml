@@ -636,11 +636,6 @@ jobs:
           grep -nE 'DMABUF_HEAPS|GOLDFISH' "$DEFCONFIG" || echo "(no matching configs)"
 
           # ---- dma_heap (放在 PAGE_POOL 后) ----
-          if ! grep -q '^CONFIG_DMABUF_HEAPS_SYSTEM=y' "$DEFCONFIG"; then
-            sed -i '/^CONFIG_DMABUF_HEAPS_PAGE_POOL=y$/a CONFIG_DMABUF_HEAPS_SYSTEM=y\nCONFIG_DMABUF_HEAPS_CMA=y' "$DEFCONFIG"
-            echo "dma_heap: added SYSTEM + CMA"
-          fi
-
           # ---- goldfish (放在 savedefconfig 期望的位置) ----
           if ! grep -q '^CONFIG_GOLDFISH=y$' "$DEFCONFIG"; then
             sed -i '/^CONFIG_X86_X2APIC=y$/a CONFIG_GOLDFISH=y' "$DEFCONFIG"
@@ -670,15 +665,15 @@ jobs:
           run_dist_target() {
             target="$1"
             dest="$2"
-            help_output=$(tools/bazel run --config=fast --lto=none "$target" -- -h 2>&1 || true)
+            help_output=$(tools/bazel run --config=stamp --lto=none "$target" -- -h 2>&1 || true)
             echo "$help_output"
 
             if grep -q -- '--destdir' <<< "$help_output"; then
               echo "Detected $target dist argument: --destdir"
-              tools/bazel run --config=fast --lto=none "$target" -- --destdir="$dest"
+              tools/bazel run --config=stamp --lto=none "$target" -- --destdir="$dest"
             elif grep -q -- '--dist_dir' <<< "$help_output"; then
               echo "Detected $target dist argument: --dist_dir"
-              tools/bazel run --config=fast --lto=none "$target" -- --dist_dir="$dest"
+              tools/bazel run --config=stamp --lto=none "$target" -- --dist_dir="$dest"
             else
               echo "Unable to detect dist argument for $target. Expected --destdir or --dist_dir in help output."
               exit 1
